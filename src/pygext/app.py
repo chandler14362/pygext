@@ -1,7 +1,13 @@
 __author__ = 'stowellc17'
 
 
-import __builtin__
+import sys
+
+
+if sys.version_info >= (3, 0):
+    import builtins as __builtin__
+else:
+    import __builtin__
 
 
 # Create the global notifer
@@ -27,9 +33,6 @@ from pygext.gameobject import GameObject
 
 from pygame.locals import *
 import pygame
-
-
-import sys
 
 
 class App(GameObject):
