@@ -28,7 +28,7 @@ class App(GameObject):
 
         # Update the window properties
         pygame.display.set_caption(global_config.get('window-title', 'PyGame'))
-        pygame.display.set_mode(global_config.get('window-res', [800, 600]))
+        self.screen = pygame.display.set_mode(global_config.get('window-res', [800, 600]))
 
         # Update the display
         pygame.display.update()
@@ -37,6 +37,9 @@ class App(GameObject):
         # Process the pending pygame events
         for event in pygame.event.get():
             global_messenger.send(event.type)
+
+        # Update the display:
+        pygame.display.update()
 
         return TASK_AGAIN
 
