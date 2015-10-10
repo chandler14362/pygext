@@ -1,38 +1,38 @@
 __author__ = 'stowellc17'
 
 
+LEVEL_DEBUG = 0
+LEVEL_INFO = 1
+LEVEL_WARNING = 2
+LEVEL_ERROR = 3
+
+
 class NotifyCategory:
     def __init__(self, notify, name):
         self.notify = notify
         self.name = name
 
     def debug(self, message):
-        if self.notify.can_output(self.notify.DEBUG):
+        if self.notify.can_output(LEVEL_DEBUG):
             print('|DEBUG| %s: %s' % (self.name, message))
 
     def info(self, message):
-        if self.notify.can_output(self.notify.INFO):
+        if self.notify.can_output(LEVEL_INFO):
             print('|INFO| %s: %s' % (self.name, message))
 
     def warning(self, message):
-        if self.notify.can_output(self.notify.WARNING):
+        if self.notify.can_output(LEVEL_WARNING):
             print('|WARNING| %s: %s' % (self.name, message))
 
     def error(self, message):
-        if self.notify.can_output(self.notify.ERROR):
+        if self.notify.can_output(LEVEL_ERROR):
             print('|ERROR| %s: %s' % (self.name, message))
             app.exit()
 
 
-
 class Notifier:
-    DEBUG = 0
-    INFO = 1
-    WARNING = 2
-    ERROR = 3
-
     def __init__(self):
-        self.notify_level = Notifier.DEBUG
+        self.notify_level = LEVEL_DEBUG
 
     def can_output(self, notify_level):
         return notify_level >= self.notify_level
@@ -40,5 +40,4 @@ class Notifier:
     def new_category(self, name):
         return NotifyCategory(self, name)
 
-    def set_notify_level(self, notify_level):
-        self.notify_level = notify_level
+global_notify = Notifier()

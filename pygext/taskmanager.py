@@ -5,12 +5,15 @@ from twisted.internet.error import AlreadyCalled
 from twisted.internet.task import LoopingCall
 from twisted.internet import reactor
 
+from pygext.notifier import global_notify
+
+
+TASK_DONE = 0
+TASK_AGAIN = 1
+
 
 class Task:
-    notify = notifier.new_category('Task')
-
-    DONE = 0
-    AGAIN = 1
+    notify = global_notify.new_category('Task')
 
     def __init__(self, task_mgr, name, method, args, kwargs, looping, delay):
         self.task_mgr = task_mgr
@@ -26,11 +29,11 @@ class Task:
     def call_method(self):
         task_status = self.method(self, *self.args, **self.kwargs)
 
-        if task_status == Task.DONE:
+        if task_status == TASK_DONE:
             self.__finish()
             return
 
-        if task_status == Task.AGAIN:
+        if task_status == TASK_AGAIN:
             if not self.looping:
                 self.start()
             return
@@ -58,52 +61,51 @@ class Task:
     def __finish(self):
         self.task_mgr.remove(self.name)
 
-    def get_name(self):
-        return self.name
-
-    def is_looping(self):
-        return self.looping
-
-    def get_delay(self):
-        return self.delay
-
 
 class TaskManager:
-    notify = notifier.new_category('TaskManager')
+    notify = global_notify.new_category('TaskManager')
 
     def __init__(self):
-        self.__tasks = {}
+        self._tasks = {}
 
-    def add(self, name, method, args=[], kwargs={}):
-        if name in self.__tasks:
+    def add(self, name, method, args=None, kwargs=None):
+        if name in self._tasks:
             self.notify.warning('Tried to add task %s when it was already in the task dict' % name)
-            return None
+            return
+
+        args = args or []
+        kwargs = kwargs or {}
 
         task = Task(self, name, method, args, kwargs, True, 0)
-        self.__tasks[name] = task
+        self._tasks[name] = task
         task.start()
 
         return task
 
-    def do_method_later(self, delay, name, method, args=[], kwargs={}):
-        if name in self.__tasks:
+    def do_method_later(self, delay, name, method, args=None, kwargs=None):
+        if name in self._tasks:
             self.notify.warning('Tried to add task %s when it was already in the task dict' % name)
-            return None
+            return
+
+        args = args or []
+        kwargs = kwargs or {}
 
         task = Task(self, name, method, args, kwargs, False, delay)
-        self.__tasks[name] = task
+        self._tasks[name] = task
         task.start()
 
         return task
 
     def remove(self, name):
-        if name not in self.__tasks:
+        if name not in self._tasks:
             self.notify.warning('Tried to remove non-existent task %s' % name)
             return
 
-        self.__tasks[name].stop()
-        del self.__tasks[name]
+        self._tasks[name].stop()
+        del self._tasks[name]
 
     def stop_all_tasks(self):
-        for name in self.__tasks:
+        for name in self._tasks:
             self.remove(name)
+
+global_taskmgr = TaskManager()

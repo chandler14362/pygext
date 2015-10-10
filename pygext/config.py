@@ -1,21 +1,21 @@
 __author__ = 'stowellc17'
 
 
-from pygext.notifier import Notifier
+from pygext import notifier
 
 import json
 
 
 notify_levels = {
-    'debug': Notifier.DEBUG,
-    'info': Notifier.INFO,
-    'warning': Notifier.WARNING,
-    'error': Notifier.ERROR
+    'debug': notifier.LEVEL_DEBUG,
+    'info': notifier.LEVEL_INFO,
+    'warning': notifier.LEVEL_WARNING,
+    'error': notifier.LEVEL_ERROR
 }
 
 
 class Config:
-    notify = notifier.new_category('Config')
+    notify = notifier.global_notify.new_category('Config')
 
     def __init__(self):
         self.__values = {}
@@ -25,7 +25,8 @@ class Config:
             config_data = json.loads(f.read())
             self.__values.update(config_data)
 
-    def get_notify_level(self):
+    @property
+    def notify_level(self):
         level = self.__values.get('notify-level', 'info')
 
         if level not in notify_levels:
@@ -36,3 +37,5 @@ class Config:
 
     def get(self, value, default_value):
         return self.__values.get(value, default_value)
+
+global_config = Config()
