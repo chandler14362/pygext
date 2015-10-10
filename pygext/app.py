@@ -11,7 +11,6 @@ from pygext.messenger import global_messenger
 from pygext.taskmanager import global_taskmgr, TASK_AGAIN
 from pygext.gameobject import GameObject
 
-from pygame.locals import *
 import pygame
 
 
@@ -43,7 +42,7 @@ class App(GameObject):
 
     def run(self):
         # Accept the QUIT event
-        self.accept(QUIT, self.exit)
+        self.accept(pygame.QUIT, self.exit)
 
         # Create the main loop
         global_taskmgr.add('main-loop', self.__tick)
@@ -52,6 +51,9 @@ class App(GameObject):
         reactor.run()
 
     def exit(self):
+        # Stop all of the current tasks:
+        global_taskmgr.stop_all_tasks()
+
         reactor.stop()
         pygame.quit()
-        sys.exit()
+        sys.exit(0)

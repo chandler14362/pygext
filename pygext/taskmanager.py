@@ -105,7 +105,7 @@ class TaskManager:
         del self._tasks[name]
 
     def stop_all_tasks(self):
-        for name in self._tasks:
+        for name in self._tasks.keys():
             self.remove(name)
 
 global_taskmgr = TaskManager()
